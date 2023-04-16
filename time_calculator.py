@@ -1,17 +1,29 @@
 def add_time(start, duration, startDay = ""):
 
     startMinutes = getStartMinutes(start)
-    durationMinutes = getDurationMinutes(duration)
-    new_time = getEndString(startMinutes+durationMinutes, startDay)
 
+    durationMinutes = getDurationMinutes(duration)
+
+    totalMinutes = startMinutes + durationMinutes
+
+    minutesToAccount = getMinutesToAccount(totalMinutes)
+
+    daysLeft = getDaysLeft(totalMinutes, minutesToAccount)
+
+    hours, minutes, ending = getFormattedTime(minutesToAccount)
+
+    new_time = getEndString(hours, minutes, ending, daysLeft, startDay)
 
     return new_time
 
-def getEndString (minutes, startDay):
-    ending = 'AM'
+def getMinutesToAccount (minutes):
+    return minutes%1440
 
-    minutesToAccount = minutes%1440
-    daysLeft = int((minutes-minutesToAccount)/(1440))
+def getDaysLeft (minutes, minutesToAccount):
+    return int((minutes-minutesToAccount)/(1440))
+
+def getFormattedTime(minutesToAccount):
+    ending = 'AM'
 
     hours = round(minutesToAccount/60)
     minutes = minutesToAccount - hours*60
@@ -29,8 +41,14 @@ def getEndString (minutes, startDay):
     
     if(hours == 0):
         hours = 12
-        
-    
+
+    return {
+        hours: hours,
+        minutes: minutes,
+        ending: ending
+    }
+
+def getEndString (hours, minutes, ending, daysLeft, startDay):
     time = str(hours)+":"+str(minutes)+" "+ending
 
     if(startDay):
@@ -58,7 +76,6 @@ def getDayOfWeek (days, startDay):
     startPosition = daysOfWeek.index(startDay.upper())
     finalPosition = (startPosition+days)%7
     return daysOfWeek[finalPosition].capitalize()
-
 
 def getStartMinutes (time):
     ending = time.split(" ")[1]
